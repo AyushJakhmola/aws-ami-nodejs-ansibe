@@ -1,0 +1,27 @@
+- name: 'Provision Image'
+  hosts: all
+  remote_user: ubuntu
+  become: true
+  tasks:
+    - name: Update repositories cache and install nodejs package
+      ansible.builtin.apt:
+        name: nodejs
+        update_cache: yes
+    - name: install nodejs and npm
+      apt:
+        pkg:                  
+        - npm
+        - ruby-full
+    - name: Install a .deb package from the internet
+      ansible.builtin.apt:
+        deb: https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb 
+    - name: codedeploy install script fetch
+      ansible.builtin.get_url:
+        url: https://aws-codedeploy-us-west-2.s3.us-west-2.amazonaws.com/latest/install
+        dest: /home/ubuntu/
+        mode: '0777'
+    - name: run codedeploy install script
+      shell: /home/ubuntu/install auto
+      args:
+        executable: bash
+    
